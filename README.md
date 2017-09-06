@@ -2,17 +2,10 @@
 
 ## Installation
 
+Just include the module in your project path. We are planning to include a setup.py soon.
+
 ### Requirements
-Install the python-qr libraries
-
-Go to https://github.com/lincolnloop/python-qrcode
-
-Download and execute:
-
-````
-sudo python setup.py install
-````
-The rest of libraries should be included in yout python distribution:
+There are not mandatory requirements for core libraries. All the used libraries should be included in yout python distribution:
 
 * urllib
 * urllib2
@@ -30,6 +23,18 @@ The rest of libraries should be included in yout python distribution:
 * Crypto.Cipher.AES
 
 ## Examples
+
+### Requirements
+
+Install the python-qr libraries
+
+Go to https://github.com/lincolnloop/python-qrcode
+
+Download and execute:
+
+````
+sudo python setup.py install
+````
 
 ### testlocal.py
 
