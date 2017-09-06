@@ -2,7 +2,17 @@
 
 ## Installation
 
-This libraries have not special requirements to meet, just be sure about the main python libraries
+### Requirements
+Install the python-qr libraries
+
+Go to https://github.com/lincolnloop/python-qrcode
+
+Download and execute:
+
+````
+sudo python setup.py install
+````
+The rest of libraries should be included in yout python distribution:
 
 * urllib
 * urllib2
@@ -64,15 +74,7 @@ Install the library by downloading with the download link on the right, unzippin
 sudo python setup.py install
 ````
 
-2. Install https://github.com/lincolnloop/python-qrcode
-
-Just download and execute:
-
-````
-sudo python setup.py install
-````
-
-3. Connect Raspberry pi to display (see pinout):
+2. Connect Raspberry pi to display (see pinout):
 
 ````
 TFT   -- RASPBERRY
@@ -96,3 +98,5 @@ Run the test
 ````
 python test.py
 ````
+
+(C) 2017 Jose Antonio Espinosa https://nomorepass.com
