@@ -6,8 +6,7 @@ import qrcode
 nmp = NoMorePass()
 qrtext = nmp.getQrText ('misitio')
 img = qrcode.make(qrtext)
-p = img.show()
-print p
+img.show()
 res = nmp.start()
 if ('error' in res):
     print "Error: "+res["error"]
