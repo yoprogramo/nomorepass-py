@@ -2,17 +2,10 @@
 
 ## Installation
 
+Just include the module in your project path. We are planning to include a setup.py soon.
+
 ### Requirements
-Install the python-qr libraries
-
-Go to https://github.com/lincolnloop/python-qrcode
-
-Download and execute:
-
-````
-sudo python setup.py install
-````
-The rest of libraries should be included in yout python distribution:
+There are not mandatory requirements for core libraries. All the used libraries should be included in yout python distribution:
 
 * urllib
 * urllib2
@@ -29,7 +22,68 @@ The rest of libraries should be included in yout python distribution:
 * getpass
 * Crypto.Cipher.AES
 
+## Usage
+
+To receive a password:
+
+````python
+from nomorepass.core import NoMorePass
+import qrcode
+
+nmp = NoMorePass()
+qrtext = nmp.getQrText ('misitio')
+#Show qr
+img = qrcode.make(qrtext)
+img.show()
+#Wait for password
+res = nmp.start()
+if ('error' in res):
+    print "Error: "+res["error"]
+else:
+    #Pass received
+    print "Usuario: "+res["user"]
+    print "Password: "+res["password"]
+    print "Extra: "+res["extra"]
+````
+
+To send a password:
+
+````python
+from nomorepass.core import NoMorePass
+import qrcode
+
+user = 'the user you want to send'
+password = 'te password you want to send'
+site = 'the site for the password'
+
+nmp = NoMorePass()
+qrtext = nmp.getQrSend(site,user,password,{'type':'pwd'})
+#Show the qr
+img = qrcode.make(qrtext)
+img.show()
+#wait for app receive the pass
+res = nmp.send()
+if ('error' in res):
+    print "Error: "+res["error"]
+else:
+    #password sent
+    print "Password received"
+    print "Please, close the qr window"
+````
+
 ## Examples
+
+### Requirements
+
+Install the python-qr libraries
+
+Go to https://github.com/lincolnloop/python-qrcode
+
+Download and execute:
+
+````
+sudo python setup.py install
+````
 
 ### testlocal.py
 
