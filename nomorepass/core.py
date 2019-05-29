@@ -4,10 +4,11 @@
 """This module implements the protocol 2 of nomorepass.com
 """
 import urllib
+import urllib2
 import json
 import random
 import time
-from nomorepass import crypt
+import mcrypt
 
 def nmp_newtoken():
     length = 12
@@ -19,12 +20,12 @@ def nmp_newtoken():
 
 def nmp_decrypt(password,token):
     print("Decoding: ["+password+"] with: "+token)
-    dec = crypt.decrypt(password, token)
+    dec = mcrypt.decrypt(password, token)
     return dec
 
 def nmp_encrypt(password,token):
     print("Encoding: ["+password+"] with: "+token)
-    dec = crypt.encrypt(token,password,False)
+    dec = mcrypt.encrypt(token,password,False)
     print (dec)
     return dec
 
@@ -44,9 +45,9 @@ class NoMorePass:
 
     def getQrText (self,site):
         data = urllib.urlencode({'site': site})
-        req = urllib.Request(self.getidUrl,data)
+        req = urllib2.Request(self.getidUrl,data)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-        r = urllib.urlopen(req)
+        r = urllib2.urlopen(req)
         if (r.getcode()==200):
             data = r.read()
             decoded = json.loads(data)
@@ -66,9 +67,9 @@ class NoMorePass:
 
         while (self.stopped == False):
             data = urllib.urlencode({'ticket': self.ticket})
-            req = urllib.Request(self.checkUrl,data)
+            req = urllib2.Request(self.checkUrl,data)
             req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-            r = urllib.urlopen(req)
+            r = urllib2.urlopen(req)
             if (r.getcode()==200):
                 data = r.read()
                 decoded = json.loads(data)
@@ -102,9 +103,9 @@ class NoMorePass:
             site='WEBDEVICE'
         device = 'WEBDEVICE'
         param = urllib.urlencode({'device': device,'fromdevice':device})
-        req = urllib.Request(self.referenceUrl,param)
+        req = urllib2.Request(self.referenceUrl,param)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-        r = urllib.urlopen(req)
+        r = urllib2.urlopen(req)
         if (r.getcode()==200):
             body = r.read()
             response = json.loads(body)
@@ -112,9 +113,9 @@ class NoMorePass:
             if (response["resultado"]=="ok"):
                 token = response["token"]
                 param = urllib.urlencode({'site': site})
-                req = urllib.Request(self.getidUrl,param)
+                req = urllib2.Request(self.getidUrl,param)
                 req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-                r = urllib.urlopen(req)
+                r = urllib2.urlopen(req)
                 if (r.getcode()==200):
                     body = r.read()
                     response = json.loads(body)
@@ -129,9 +130,9 @@ class NoMorePass:
                                     extra['extra']['secret']=nmp_encrypt(str(extra['extra']['secret']),tk)
                             extra = json.dumps(extra)
                         param = urllib.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra})
-                        req = urllib.Request(self.grantUrl,param)
+                        req = urllib2.Request(self.grantUrl,param)
                         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-                        r = urllib.urlopen(req)
+                        r = urllib2.urlopen(req)
                         if (r.getcode()==200):
                             body = r.read()
                             response = json.loads(body)
@@ -157,9 +158,9 @@ class NoMorePass:
     def send (self):
         while True:
             param = urllib.urlencode({'device': 'WEBDEVICE', 'ticket': self.ticket})
-            req = urllib.Request(self.pingUrl,param)
+            req = urllib2.Request(self.pingUrl,param)
             req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-            r = urllib.urlopen(req)
+            r = urllib2.urlopen(req)
             if (r.getcode()==200):
                 body = r.read()
                 response = json.loads(body)
