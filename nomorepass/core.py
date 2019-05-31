@@ -20,7 +20,7 @@ def nmp_newtoken():
 
 def nmp_decrypt(password,token):
     print("Decoding: ["+password+"] with: "+token)
-    dec = mcrypt.decrypt(password, token)
+    dec = mcrypt.decrypt(token, password)
     return dec
 
 def nmp_encrypt(password,token):
