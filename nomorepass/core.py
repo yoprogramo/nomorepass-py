@@ -3,29 +3,30 @@
 # All rights reserved.
 """This module implements the protocol 2 of nomorepass.com
 """
-import urllib
-import urllib2
+import urllib.parse
+import urllib.request
 import json
 import random
 import time
-import mcrypt
+from nomorepass import mcrypt as crypt
+
 
 def nmp_newtoken():
     length = 12
     charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     retVal = ""
     for i in range (0,length):
-      retVal += charset[random.randint(0,len(charset)-1)]
+        retVal += charset[random.randint(0,len(charset)-1)]
     return retVal
 
 def nmp_decrypt(password,token):
     print("Decoding: ["+password+"] with: "+token)
-    dec = mcrypt.decrypt(token, password)
+    dec = crypt.decrypt(password, token)
     return dec
 
 def nmp_encrypt(password,token):
     print("Encoding: ["+password+"] with: "+token)
-    dec = mcrypt.encrypt(token,password,False)
+    dec = crypt.encrypt(token,password,False)
     print (dec)
     return dec
 
@@ -44,10 +45,10 @@ class NoMorePass:
         self.stopped = False
 
     def getQrText (self,site):
-        data = urllib.urlencode({'site': site})
-        req = urllib2.Request(self.getidUrl,data)
+        data = urllib.parse.urlencode({'site': site}).encode("utf-8")
+        req = urllib.request.Request(self.getidUrl,data)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-        r = urllib2.urlopen(req)
+        r = urllib.request.urlopen(req)
         if (r.getcode()==200):
             data = r.read()
             decoded = json.loads(data)
@@ -58,6 +59,69 @@ class NoMorePass:
                 return text
             else:
                 return False
+    
+    def getQrNomorekeys (self,site, user, password, type, extra):
+        if type!="SOUNDKEY" and type!="LIGHTKEY":
+            return False
+        if (site==None):
+            site='WEBDEVICE'
+        device = 'WEBDEVICE'
+        param = urllib.parse.urlencode({'device': device,'fromdevice':device}).encode("utf-8")
+        req = urllib.request.Request(self.referenceUrl,param)
+        req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+        r = urllib.request.urlopen(req)
+        if (r.getcode()==200):
+            body = r.read()
+            response = json.loads(body)
+            print (body)
+            if (response["resultado"]=="ok"):
+                token = response["token"]
+                param = urllib.parse.urlencode({'site': site}).encode("utf-8")
+                req = urllib.request.Request(self.getidUrl,param)
+                req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                r = urllib.request.urlopen(req)
+                if (r.getcode()==200):
+                    body = r.read()
+                    response = json.loads(body)
+                    if (response["resultado"]=="ok"):
+                        tk = nmp_newtoken()
+                        self.token = tk
+                        self.ticket = response["ticket"]
+                        ep = nmp_encrypt(password,tk)
+                        if (isinstance(extra,dict)):
+                            if 'extra' in extra.keys():
+                                if isinstance(extra['extra'],dict) and 'secret' in extra['extra'].keys():
+                                    extra['extra']['secret']=nmp_encrypt(str(extra['extra']['secret']),tk)
+                            extra['extra'] = {'type': type.lower()}
+                            extra = json.dumps(extra)
+                        else:
+                            extra = {'extra': {'type': type.lower()}}
+                            extra = json.dumps(extra)
+                        param = urllib.parse.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra}).encode("utf-8")
+                        req = urllib.request.Request(self.grantUrl,param)
+                        req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                        r = urllib.request.urlopen(req)
+                        if (r.getcode()==200):
+                            body = r.read()
+                            response = json.loads(body)
+                            print("Granted")
+                            text = 'nomorekeys://'+type+tk+response['ticket']+site
+                            return text
+                        else:
+                            print("Error calling grant")
+                            return False
+                    else:
+                        print("Not known device")
+                        return False
+                else:
+                    print("Error calling getid")
+                    return False
+            else:
+                print("Unknown device")
+                return False
+        else:
+            print("Error calling reference")
+            return False
 
     def start(self):
         #Comenzamos a preguntar (check) si nos han enviado el pass
@@ -66,10 +130,10 @@ class NoMorePass:
         #o hasta que el valor del atributo stopped es cierto
 
         while (self.stopped == False):
-            data = urllib.urlencode({'ticket': self.ticket})
-            req = urllib2.Request(self.checkUrl,data)
+            data = urllib.parse.urlencode({'ticket': self.ticket}).encode("utf-8")
+            req = urllib.request.Request(self.checkUrl,data)
             req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-            r = urllib2.urlopen(req)
+            r = urllib.request.urlopen(req)
             if (r.getcode()==200):
                 data = r.read()
                 decoded = json.loads(data)
@@ -102,20 +166,20 @@ class NoMorePass:
         if (site==None):
             site='WEBDEVICE'
         device = 'WEBDEVICE'
-        param = urllib.urlencode({'device': device,'fromdevice':device})
-        req = urllib2.Request(self.referenceUrl,param)
+        param = urllib.parse.urlencode({'device': device,'fromdevice':device}).encode("utf-8")
+        req = urllib.request.Request(self.referenceUrl,param)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-        r = urllib2.urlopen(req)
+        r = urllib.request.urlopen(req)
         if (r.getcode()==200):
             body = r.read()
             response = json.loads(body)
             print (body)
             if (response["resultado"]=="ok"):
                 token = response["token"]
-                param = urllib.urlencode({'site': site})
-                req = urllib2.Request(self.getidUrl,param)
+                param = urllib.parse.urlencode({'site': site}).encode("utf-8")
+                req = urllib.request.Request(self.getidUrl,param)
                 req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-                r = urllib2.urlopen(req)
+                r = urllib.request.urlopen(req)
                 if (r.getcode()==200):
                     body = r.read()
                     response = json.loads(body)
@@ -129,10 +193,10 @@ class NoMorePass:
                                 if isinstance(extra['extra'],dict) and 'secret' in extra['extra'].keys():
                                     extra['extra']['secret']=nmp_encrypt(str(extra['extra']['secret']),tk)
                             extra = json.dumps(extra)
-                        param = urllib.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra})
-                        req = urllib2.Request(self.grantUrl,param)
+                        param = urllib.parse.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra}).encode("utf-8")
+                        req = urllib.request.Request(self.grantUrl,param)
                         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-                        r = urllib2.urlopen(req)
+                        r = urllib.request.urlopen(req)
                         if (r.getcode()==200):
                             body = r.read()
                             response = json.loads(body)
@@ -157,10 +221,10 @@ class NoMorePass:
 
     def send (self):
         while True:
-            param = urllib.urlencode({'device': 'WEBDEVICE', 'ticket': self.ticket})
-            req = urllib2.Request(self.pingUrl,param)
+            param = urllib.parse.urlencode({'device': 'WEBDEVICE', 'ticket': self.ticket}).encode("utf-8")
+            req = urllib.request.Request(self.pingUrl,param)
             req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
-            r = urllib2.urlopen(req)
+            r = urllib.request.urlopen(req)
             if (r.getcode()==200):
                 body = r.read()
                 response = json.loads(body)
@@ -168,4 +232,4 @@ class NoMorePass:
                     time.sleep(4)
                 else:
                     return response
-         
+
