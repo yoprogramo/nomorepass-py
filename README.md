@@ -2,25 +2,22 @@
 
 ## Installation
 
-Just include the module in your project path. We are planning to include a setup.py soon.
+Install pipenv
+
+```
+pip install pipenv
+```
 
 ### Requirements
-There are not mandatory requirements for core libraries. All the used libraries should be included in yout python distribution:
 
-* urllib
-* urllib2
-* json
-* random
-* time
-* argparse
-* base64
-* os
-* re
-* hashlib
-* inspect
-* sys
-* getpass
-* Crypto.Cipher.AES
+We use pipenv, the requierements are included in Pipfile for the test
+
+For example, to execute the receive password test:
+
+```
+pipenv install
+pipenv run python testlocal.py
+```
 
 ## Usage
 
@@ -72,18 +69,6 @@ else:
 ````
 
 ## Examples
-
-### Requirements
-
-Install the python-qr libraries
-
-Go to https://github.com/lincolnloop/python-qrcode
-
-Download and execute:
-
-````
-sudo python setup.py install
-````
 
 ### testlocal.py
 
@@ -153,4 +138,4 @@ Run the test
 python test.py
 ````
 
-(C) 2017 Jose Antonio Espinosa https://nomorepass.com
+(C) 2021 Jose Antonio Espinosa https://nomorepass.com
