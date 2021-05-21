@@ -26,7 +26,7 @@ def nmp_decrypt(password,token):
 
 def nmp_encrypt(password,token):
     print("Encoding: ["+password+"] with: "+token)
-    dec = crypt.encrypt(token,password,False)
+    dec = crypt.encrypt(token,password,False).decode("utf-8")
     print (dec)
     return dec
 
@@ -92,7 +92,9 @@ class NoMorePass:
                             if 'extra' in extra.keys():
                                 if isinstance(extra['extra'],dict) and 'secret' in extra['extra'].keys():
                                     extra['extra']['secret']=nmp_encrypt(str(extra['extra']['secret']),tk)
-                            extra['extra'] = {'type': type.lower()}
+                                    extra['extra']['type'] = type.lower()
+                                else:
+                                    extra['extra'] = {'type': type.lower()}
                             extra = json.dumps(extra)
                         else:
                             extra = {'extra': {'type': type.lower()}}
