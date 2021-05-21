@@ -87,6 +87,7 @@ class NoMorePass:
                         tk = nmp_newtoken()
                         self.token = tk
                         self.ticket = response["ticket"]
+                        password = password[:14].ljust(14)
                         ep = nmp_encrypt(password,tk)
                         if (isinstance(extra,dict)):
                             if 'extra' in extra.keys():
