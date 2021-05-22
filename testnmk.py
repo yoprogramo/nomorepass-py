@@ -4,7 +4,7 @@ from nomorepass.core import NoMorePass
 import qrcode
 
 nmp = NoMorePass()
-qrtext = nmp.getQrNomorekeys ("Llave Casa Nueva","key","HOLA MUNDO    ","SOUNDKEY",{'extra': {'secret': '1234567890123456'}})
+qrtext = nmp.getQrNomorekeys ("Prueba1","key","Clave secreta","SOUNDKEY",{'extra': {'secret': '1234567890123456'}})
 print (qrtext)
 img = qrcode.make(qrtext)
 img.show()

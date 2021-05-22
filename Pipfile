@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 qrcode = {extras = ["pil"], version = "*"}
+pycrypto = "*"
 
 [dev-packages]
 
