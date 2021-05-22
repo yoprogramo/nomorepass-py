@@ -134,7 +134,7 @@ def encrypt(password, plaintext, chunkit=True, msgdgst='md5'):
 
     # Encrypt
     cipher = AES.new(key, AES.MODE_CBC, iv)
-    ciphertext = cipher.encrypt(padded_plaintext)
+    ciphertext = cipher.encrypt(padded_plaintext.encode("utf-8"))
 
     # Make openssl compatible.
     # I first discovered this when I wrote the C++ Cipher class.
@@ -189,7 +189,7 @@ def decrypt(password, ciphertext, msgdgst='md5'):
         filtered += line + nl
 
     # Base64 decode
-    raw = base64.b64decode(filtered)
+    raw = base64.b64decode(filtered.encode("utf-8"))
     assert(raw[:8] == b'Salted__' )
     salt = raw[8:16]  # get the salt
 
@@ -210,7 +210,7 @@ def decrypt(password, ciphertext, msgdgst='md5'):
     else:
         padding_len = padded_plaintext[-1]
     plaintext = padded_plaintext[:-padding_len]
-    return plaintext
+    return plaintext.decode('utf-8')
 
 
 # include the code above ...
