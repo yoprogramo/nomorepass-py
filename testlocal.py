@@ -3,7 +3,9 @@
 from nomorepass.core import NoMorePass
 import qrcode
 
-nmp = NoMorePass()
+apikey='FREEAPIKEY' # Change by your own nomorepass apikey
+
+nmp = NoMorePass('api.nomorepass.com',apikey)
 qrtext = nmp.getQrText ('misitio')
 print (qrtext)
 img = qrcode.make(qrtext)

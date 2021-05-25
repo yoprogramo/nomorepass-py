@@ -21,7 +21,9 @@ if extra:
 else:
     extra = {'type':'pwd'}
 
-nmp = NoMorePass()
+apikey='FREEAPIKEY' # Change by your own nomorepass apikey
+
+nmp = NoMorePass('api.nomorepass.com',apikey)
 qrtext = nmp.getQrSend(site,user,password,extra)
 print (qrtext)
 img = qrcode.make(qrtext)

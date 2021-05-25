@@ -32,9 +32,10 @@ def nmp_encrypt(password,token):
 
 class NoMorePass:
     """ Interface to the protocol 2 """
-    def __init__(self,server=None):
+    def __init__(self,server=None,apikey=None):
         if (server==None):
             server='nomorepass.com'
+        self.apikey=apikey
         self.server=server
         self.base="https://"+server
         self.getidUrl = self.base+"/api/getid.php"
@@ -48,6 +49,8 @@ class NoMorePass:
         data = urllib.parse.urlencode({'site': site}).encode("utf-8")
         req = urllib.request.Request(self.getidUrl,data)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+        if (self.apikey!=None):
+            req.add_header('apikey',self.apikey)
         r = urllib.request.urlopen(req)
         if (r.getcode()==200):
             data = r.read()
@@ -61,6 +64,10 @@ class NoMorePass:
                 return False
     
     def getQrNomorekeys (self,site, user, password, type, extra):
+        """ Returns the QR url to send a nomorekeys key to the phone """
+        """ basically the same as getQRSend but with nomorekeys://   """
+        """ only available for soundkey and lightkey right now       """
+        """ SOUNDKEY passwords are limited to 14 characters          """
         if type!="SOUNDKEY" and type!="LIGHTKEY":
             return False
         if (site==None):
@@ -69,6 +76,8 @@ class NoMorePass:
         param = urllib.parse.urlencode({'device': device,'fromdevice':device}).encode("utf-8")
         req = urllib.request.Request(self.referenceUrl,param)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+        if (self.apikey!=None):
+            req.add_header('apikey',self.apikey)
         r = urllib.request.urlopen(req)
         if (r.getcode()==200):
             body = r.read()
@@ -79,6 +88,8 @@ class NoMorePass:
                 param = urllib.parse.urlencode({'site': site}).encode("utf-8")
                 req = urllib.request.Request(self.getidUrl,param)
                 req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                if (self.apikey!=None):
+                    req.add_header('apikey',self.apikey)
                 r = urllib.request.urlopen(req)
                 if (r.getcode()==200):
                     body = r.read()
@@ -102,7 +113,9 @@ class NoMorePass:
                             extra = json.dumps(extra)
                         param = urllib.parse.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra}).encode("utf-8")
                         req = urllib.request.Request(self.grantUrl,param)
-                        req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                        req.add_header('User-Agent', 'NoMoreKeys-IoT/1.0')
+                        if (self.apikey!=None):
+                            req.add_header('apikey',self.apikey)
                         r = urllib.request.urlopen(req)
                         if (r.getcode()==200):
                             body = r.read()
@@ -136,6 +149,8 @@ class NoMorePass:
             data = urllib.parse.urlencode({'ticket': self.ticket}).encode("utf-8")
             req = urllib.request.Request(self.checkUrl,data)
             req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+            if (self.apikey!=None):
+                req.add_header('apikey',self.apikey)
             r = urllib.request.urlopen(req)
             if (r.getcode()==200):
                 data = r.read()
@@ -172,6 +187,8 @@ class NoMorePass:
         param = urllib.parse.urlencode({'device': device,'fromdevice':device}).encode("utf-8")
         req = urllib.request.Request(self.referenceUrl,param)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+        if (self.apikey!=None):
+            req.add_header('apikey',self.apikey)
         r = urllib.request.urlopen(req)
         if (r.getcode()==200):
             body = r.read()
@@ -182,6 +199,8 @@ class NoMorePass:
                 param = urllib.parse.urlencode({'site': site}).encode("utf-8")
                 req = urllib.request.Request(self.getidUrl,param)
                 req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                if (self.apikey!=None):
+                    req.add_header('apikey',self.apikey)
                 r = urllib.request.urlopen(req)
                 if (r.getcode()==200):
                     body = r.read()
@@ -199,6 +218,8 @@ class NoMorePass:
                         param = urllib.parse.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra}).encode("utf-8")
                         req = urllib.request.Request(self.grantUrl,param)
                         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                        if (self.apikey!=None):
+                            req.add_header('apikey',self.apikey)
                         r = urllib.request.urlopen(req)
                         if (r.getcode()==200):
                             body = r.read()
@@ -227,6 +248,8 @@ class NoMorePass:
             param = urllib.parse.urlencode({'device': 'WEBDEVICE', 'ticket': self.ticket}).encode("utf-8")
             req = urllib.request.Request(self.pingUrl,param)
             req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+            if (self.apikey!=None):
+                req.add_header('apikey',self.apikey)
             r = urllib.request.urlopen(req)
             if (r.getcode()==200):
                 body = r.read()
