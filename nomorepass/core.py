@@ -98,7 +98,7 @@ class NoMorePass:
                         tk = nmp_newtoken()
                         self.token = tk
                         self.ticket = response["ticket"]
-                        if (type=='soundkey'):
+                        if (type=='SOUNDKEY'):
                             password = password[:14].ljust(14)
                         else:
                             #lightkeys son un solo entero, la clave ha de ser
