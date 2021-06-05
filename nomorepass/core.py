@@ -98,7 +98,13 @@ class NoMorePass:
                         tk = nmp_newtoken()
                         self.token = tk
                         self.ticket = response["ticket"]
-                        password = password[:14].ljust(14)
+                        if (type=='soundkey'):
+                            password = password[:14].ljust(14)
+                        else:
+                            #lightkeys son un solo entero, la clave ha de ser
+                            #un numero de 0 a 65536 (unsigned) por lo que
+                            #hacemos el resto y volvemos a pasar a cadena
+                            password = str(int(password)%65536)
                         ep = nmp_encrypt(password,tk)
                         if (isinstance(extra,dict)):
                             if 'extra' in extra.keys():
