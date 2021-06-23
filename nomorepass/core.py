@@ -264,4 +264,56 @@ class NoMorePass:
                     time.sleep(4)
                 else:
                     return response
+    
+    def sendRemotePassToDevice (self,cloud,deviceid,secret,username,password):
+        # Envía una contraseña remota a un dispositivo cloud
+        # cloud: url de /extern/send_ticket 
+        # devideid: id del dispositivo
+        # secret: md5 del secreto del dispositivo
+        # username: usuario
+        # password: contraseña
+        cloudurl = cloud
+        if cloudurl==None:
+            cloudurl = "https://api.nmkeys.com/extern/send_ticket"
+        token = secret
+        param = urllib.parse.urlencode({'site': 'Send remote pass'}).encode("utf-8")
+        req = urllib.request.Request(self.getidUrl,param)
+        req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+        if (self.apikey!=None):
+            req.add_header('apikey',self.apikey)
+        r = urllib.request.urlopen(req)
+        if (r.getcode()==200):
+            body = r.read()
+            response = json.loads(body)
+            if response["resultado"]=="ok":
+                ticket = response["ticket"]
+                ep = nmp_encrypt(password,token)
+                param = urllib.parse.urlencode({'grant': 'grant', 'ticket': ticket, 'user': username, 'password': ep, 'extra': '{"type": "remote"}'}).encode("utf-8")
+                req = urllib.request.Request(self.grantUrl,param)
+                req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
+                if (self.apikey!=None):
+                    req.add_header('apikey',self.apikey)
+                r = urllib.request.urlopen(req)
+                if (r.getcode()==200):
+                    body = r.read()
+                    response = json.loads(body)
+                    if response["resultado"]=="ok":
+                        param = json.dumps({'hash': token[:10], 'ticket': ticket, 'deviceid': deviceid}).encode("utf-8")
+                        req = urllib.request.Request(cloudurl,data=param,headers={'content-type': 'application/json'})
+                        r = urllib.request.urlopen(req)
+                        if (r.getcode()==200):
+                            body = r.read()
+                            response = json.loads(body)
+                            return response
+                        else:
+                            return "error calling "+cloudurl
+                    else:
+                        print ("Error en granturl")
+                        return response
+                else:
+                    return "error calling granturl"
+            else:
+                return response
+        else:
+            return "error calling getid"
 
