@@ -126,7 +126,7 @@ def encrypt(password, plaintext, chunkit=True, msgdgst='md5'):
         return None
 
     # PKCS#7 padding
-    padding_len = 16 - (len(plaintext) % 16)
+    padding_len = 16 - (len(plaintext.encode('utf-8')) % 16)
     if isinstance(plaintext, str):
         padded_plaintext = plaintext + (chr(padding_len) * padding_len)
     else: # assume bytes
