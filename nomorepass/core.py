@@ -68,7 +68,7 @@ class NoMorePass:
         """ basically the same as getQRSend but with nomorekeys://   """
         """ only available for soundkey and lightkey right now       """
         """ SOUNDKEY passwords are limited to 14 characters          """
-        if type!="SOUNDKEY" and type!="LIGHTKEY":
+        if type!="SOUNDKEY" and type!="LIGHTKEY" and type!="BLEKEY":
             return False
         if (site==None):
             site='WEBDEVICE'
@@ -101,10 +101,11 @@ class NoMorePass:
                         if (type=='SOUNDKEY'):
                             password = password[:14].ljust(14)
                         else:
-                            #lightkeys son un solo entero, la clave ha de ser
-                            #un numero de 0 a 65536 (unsigned) por lo que
-                            #hacemos el resto y volvemos a pasar a cadena
-                            password = str(int(password)%65536)
+                            if type=='LIGHTKEY':
+                                #lightkeys son un solo entero, la clave ha de ser
+                                #un numero de 0 a 65536 (unsigned) por lo que
+                                #hacemos el resto y volvemos a pasar a cadena
+                                password = str(int(password)%65536)
                         ep = nmp_encrypt(password,tk)
                         if (isinstance(extra,dict)):
                             if 'extra' in extra.keys():
