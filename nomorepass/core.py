@@ -44,9 +44,13 @@ class NoMorePass:
         self.grantUrl = self.base+"/api/grant.php"
         self.pingUrl = self.base+"/api/ping.php"
         self.stopped = False
+        self.expiry = None
 
     def getQrText (self,site):
-        data = urllib.parse.urlencode({'site': site}).encode("utf-8")
+        params = {'site': site}
+        if self.expiry!=None:
+            params['expiry'] = self.expiry
+        data = urllib.parse.urlencode(params).encode("utf-8")
         req = urllib.request.Request(self.getidUrl,data)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
         if (self.apikey!=None):
@@ -85,7 +89,10 @@ class NoMorePass:
             print (body)
             if (response["resultado"]=="ok"):
                 token = response["token"]
-                param = urllib.parse.urlencode({'site': site}).encode("utf-8")
+                params = {'site': site}
+                if self.expiry!=None:
+                    params['expiry'] = self.expiry
+                param = urllib.parse.urlencode(params).encode("utf-8")
                 req = urllib.request.Request(self.getidUrl,param)
                 req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
                 if (self.apikey!=None):
@@ -203,7 +210,10 @@ class NoMorePass:
             print (body)
             if (response["resultado"]=="ok"):
                 token = response["token"]
-                param = urllib.parse.urlencode({'site': site}).encode("utf-8")
+                params = {'site': site}
+                if self.expiry!=None:
+                    params['expiry'] = self.expiry
+                param = urllib.parse.urlencode(params).encode("utf-8")
                 req = urllib.request.Request(self.getidUrl,param)
                 req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
                 if (self.apikey!=None):
@@ -277,7 +287,10 @@ class NoMorePass:
         if cloudurl==None:
             cloudurl = "https://api.nmkeys.com/extern/send_ticket"
         token = secret
-        param = urllib.parse.urlencode({'site': 'Send remote pass'}).encode("utf-8")
+        params = {'site': 'Send remote pass'}
+        if self.expiry!=None:
+            params['expiry'] = self.expiry
+        param = urllib.parse.urlencode(params).encode("utf-8")
         req = urllib.request.Request(self.getidUrl,param)
         req.add_header('User-Agent', 'NoMorePass-IoT/1.0')
         if (self.apikey!=None):
@@ -318,3 +331,6 @@ class NoMorePass:
         else:
             return "error calling getid"
 
+    def setExpiry(self, expiry):
+        self.expiry = expiry
+        
