@@ -73,7 +73,7 @@ class NoMorePass:
         """ only available for soundkey and lightkey right now       """
         """ SOUNDKEY passwords are limited to 14 characters          """
         if type!="SOUNDKEY" and type!="LIGHTKEY" and type!="BLEKEY":
-            return False
+            type="KEY" # clave genérica por defecto
         if (site==None):
             site='WEBDEVICE'
         device = 'WEBDEVICE'
@@ -113,17 +113,23 @@ class NoMorePass:
                                 #un numero de 0 a 65536 (unsigned) por lo que
                                 #hacemos el resto y volvemos a pasar a cadena
                                 password = str(int(password)%65536)
+
                         ep = nmp_encrypt(password,tk)
                         if (isinstance(extra,dict)):
                             if 'extra' in extra.keys():
                                 if isinstance(extra['extra'],dict) and 'secret' in extra['extra'].keys():
                                     extra['extra']['secret']=nmp_encrypt(str(extra['extra']['secret']),tk)
-                                    extra['extra']['type'] = type.lower()
                                 else:
-                                    extra['extra'] = {'type': type.lower()}
+                                    if not isinstance(extra['extra'],dict):
+                                        extra['extra'] = {'type': type.lower()}
+                            if 'type' not in extra['extra'].keys():
+                                extra['extra']['type'] = type.lower()
+                            extra['type'] = type.lower();
                             extra = json.dumps(extra)
                         else:
-                            extra = {'extra': {'type': type.lower()}}
+                            extra = {'type':type.lower(), 'extra': {'type': type.lower()}}
+                            if type=='KEY':
+                                extra['extra']['type'] = 'padkey'
                             extra = json.dumps(extra)
                         param = urllib.parse.urlencode({'grant': 'grant','ticket':self.ticket,'user':user,'password':ep,'extra':extra}).encode("utf-8")
                         req = urllib.request.Request(self.grantUrl,param)
